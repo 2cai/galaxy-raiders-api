@@ -16,7 +16,8 @@ data class Vector2D(val dx: Double, val dy: Double) {
     get() = Math.atan2(this.dy, this.dx)
 
   val degree: Double
-    get() = radiant * 180.0 / Math.PI
+    const val piRadians = 180.0
+    get() = radiant * piRadians / Math.PI
 
   val unit: Vector2D
     get() = this / magnitude
