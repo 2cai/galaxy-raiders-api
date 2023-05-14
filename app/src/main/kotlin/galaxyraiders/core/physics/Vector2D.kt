@@ -3,6 +3,8 @@ package galaxyraiders.core.physics
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
+const val PI_RADIANS = 180.0
+
 @JsonIgnoreProperties("unit", "normal", "degree", "magnitude")
 data class Vector2D(val dx: Double, val dy: Double) {
   override fun toString(): String {
@@ -16,8 +18,7 @@ data class Vector2D(val dx: Double, val dy: Double) {
     get() = Math.atan2(this.dy, this.dx)
 
   val degree: Double
-    const val piRadians = 180.0
-    get() = radiant * piRadians / Math.PI
+    get() = radiant * PI_RADIANS / Math.PI
 
   val unit: Vector2D
     get() = this / magnitude
