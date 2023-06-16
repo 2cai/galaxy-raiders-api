@@ -88,6 +88,11 @@ class GameEngine(
     this.field.spaceObjects.forEachPair {
         (first, second) ->
       if (first.impacts(second)) {
+        if((first.type == "Missile" && second.type == "Asteroid") || 
+            (first.type == "Asteroid" && second.type == "Missile")) {
+          first.collided = true
+          second.collided = true
+        }
         first.collideWith(second, GameEngineConfig.coefficientRestitution)
       }
     }

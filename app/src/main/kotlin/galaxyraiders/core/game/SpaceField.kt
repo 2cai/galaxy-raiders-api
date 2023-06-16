@@ -38,19 +38,22 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
   var asteroids: List<Asteroid> = emptyList()
     private set
 
+  var explosions: List<Explosion> = emptyList()
+    private set
+
   val spaceObjects: List<SpaceObject>
-    get() = listOf(this.ship) + this.missiles + this.asteroids
+    get() = listOf(this.ship) + this.missiles + this.asteroids + this.explosions
 
   fun moveShip() {
     this.ship.move(boundaryX, boundaryY)
   }
 
   fun moveMissiles() {
-    this.missiles.forEach { it.move() }
+    this.missiles.forEach { if(!it.collided) it.move() }
   }
 
   fun moveAsteroids() {
-    this.asteroids.forEach { it.move() }
+    this.asteroids.forEach { if(!it.collided) it.move() }
   }
 
   fun generateMissile() {
@@ -59,6 +62,10 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
 
   fun generateAsteroid() {
     this.asteroids += this.createAsteroidWithRandomProperties()
+  }
+
+  fun generateExplosion() {
+    this.explosions += this.createExplosion()
   }
 
   fun trimMissiles() {
@@ -96,6 +103,7 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
       initialVelocity = defineMissileVelocity(),
       radius = SpaceFieldConfig.missileRadius,
       mass = SpaceFieldConfig.missileMass,
+      collided = false,
     )
   }
 
@@ -107,12 +115,22 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
     return Vector2D(dx = 0.0, dy = 1.0)
   }
 
+  private fun createExplosion(): Explosion {
+    return Explosion(
+      initialPosition = generateRandomAsteroidPosition(),
+      initialVelocity = generateRandomAsteroidVelocity(),
+      radius = generateRandomAsteroidRadius(),
+      mass = generateRandomAsteroidMass(),
+    )
+  }
+
   private fun createAsteroidWithRandomProperties(): Asteroid {
     return Asteroid(
       initialPosition = generateRandomAsteroidPosition(),
       initialVelocity = generateRandomAsteroidVelocity(),
       radius = generateRandomAsteroidRadius(),
       mass = generateRandomAsteroidMass(),
+      collided = false,
     )
   }
 
