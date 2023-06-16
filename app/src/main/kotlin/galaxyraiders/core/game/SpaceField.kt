@@ -23,6 +23,9 @@ object SpaceFieldConfig {
   val asteroidMinMass = config.get<Int>("ASTEROID_MIN_MASS")
   val asteroidMaxMass = config.get<Int>("ASTEROID_MAX_MASS")
   val asteroidMassMultiplier = config.get<Double>("ASTEROID_MASS_MULTIPLIER")
+
+  val explosionRadius = config.get<Double>("EXPLOSION_RADIUS")
+  val explosionMass = config.get<Double>("EXPLOSION_MASS")
 }
 
 @Suppress("TooManyFunctions")
@@ -49,11 +52,11 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
   }
 
   fun moveMissiles() {
-    this.missiles.forEach { if(!it.collided) it.move() }
+    this.missiles.forEach { if(it.collided == false) it.move() else println("stop")}
   }
 
   fun moveAsteroids() {
-    this.asteroids.forEach { if(!it.collided) it.move() }
+    this.asteroids.forEach { if(it.collided == false) it.move() else println("stop") }
   }
 
   fun generateMissile() {
@@ -64,8 +67,8 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
     this.asteroids += this.createAsteroidWithRandomProperties()
   }
 
-  fun generateExplosion() {
-    this.explosions += this.createExplosion()
+  fun generateExplosion(point: Point2D) {
+    this.explosions += this.createExplosion(point)
   }
 
   fun trimMissiles() {
@@ -77,6 +80,12 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
   fun trimAsteroids() {
     this.asteroids = this.asteroids.filter {
       it.inBoundaries(this.boundaryX, this.boundaryY)
+    }
+  }
+  
+  fun trimExplosions() {
+    this.explosions = this.explosions.filter {
+      it.counter-- > 0 
     }
   }
 
@@ -115,12 +124,13 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
     return Vector2D(dx = 0.0, dy = 1.0)
   }
 
-  private fun createExplosion(): Explosion {
+  private fun createExplosion(point: Point2D): Explosion {
     return Explosion(
-      initialPosition = generateRandomAsteroidPosition(),
-      initialVelocity = generateRandomAsteroidVelocity(),
-      radius = generateRandomAsteroidRadius(),
-      mass = generateRandomAsteroidMass(),
+      initialPosition = point,
+      initialVelocity = Vector2D(dx = 0.0, dy = 0.0),
+      radius = SpaceFieldConfig.explosionRadius,
+      mass = SpaceFieldConfig.explosionMass,
+      counter = 50
     )
   }
 
