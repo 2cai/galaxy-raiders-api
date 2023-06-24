@@ -6,7 +6,7 @@ services:
       context: .
       target: "runner"
     ports:
-      - "5000:5000"
+      - "5001:5001"
     profiles:
       - "prod"
     environment:
@@ -53,7 +53,7 @@ services:
       target: "base"
     command: "gradle --continuous runShadow"
     ports:
-      - "5000:5000"
+      - "5001:5001"
     volumes:
       - "./:/home/gradle/galaxy-raiders/"
     profiles:
