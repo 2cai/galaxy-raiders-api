@@ -15,7 +15,6 @@ data class Registry(
 
 object RegistrarConfig {
   private val config = Config(prefix = "GR__CORE__SCORE__")
-
   val scoreboardFilename = config.get<String>("SCOREBOARD__FILENAME")
   val leaderboardFilename = config.get<String>("LEADERBOARD__FILENAME")
 }
@@ -24,8 +23,8 @@ class Registrar() {
   val mapper = jacksonObjectMapper()
 
   fun init() {
-    var scoreboard = File("Scoreboard.json")
-    var leaderboard = File("Leaderboard.json")
+    var scoreboard = File(RegistrarConfig.scoreboardFilename)
+    var leaderboard = File(RegistrarConfig.leaderboardFilename)
     if(!scoreboard.exists() || !scoreboard.exists()) {
       scoreboard.writeText("[]")
       leaderboard.writeText("[]")
@@ -45,16 +44,16 @@ class Registrar() {
   }
 
   fun updateLeaderboard() {
-    var registries = read("Scoreboard.json")
+    var registries = read(RegistrarConfig.scoreboardFilename)
     var sortedRegistries = registries.sortedWith(compareBy({ it.score }))
     sortedRegistries = sortedRegistries.reversed()
-    val lastLeader = max(sortedRegistries.size - 1, 2)
+    val lastLeader = Math.min(sortedRegistries.size - 1, 2)
     var leaderRegistries = sortedRegistries.slice(0..lastLeader)
-    write("Leaderboard.json", ArrayList(leaderRegistries))
+    write(RegistrarConfig.leaderboardFilename, ArrayList(leaderRegistries))
   }
 
   fun incrementScore(runId: String, score: Double) {
-    var registries = read("Scoreboard.json")
+    var registries = read(RegistrarConfig.scoreboardFilename)
 
     registries.forEach { 
       if (it.runId == runId) {
@@ -63,7 +62,7 @@ class Registrar() {
       }
     }
 
-    write("Scoreboard.json", registries)
+    write(RegistrarConfig.scoreboardFilename, registries)
 
     this.updateLeaderboard()
   }
@@ -72,9 +71,9 @@ class Registrar() {
     val runId = UUID.randomUUID().toString()
     val timestamp = LocalDateTime.now().toString()
 
-    var registries = read("Scoreboard.json")
+    var registries = read(RegistrarConfig.scoreboardFilename)
     registries.add(Registry(runId, timestamp, 0.0, 0))
-    write("Scoreboard.json", registries)
+    write(RegistrarConfig.scoreboardFilename, registries)
 
     return runId
   }
