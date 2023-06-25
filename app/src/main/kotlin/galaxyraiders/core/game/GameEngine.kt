@@ -35,6 +35,8 @@ class GameEngine(
     generator = generator
   )
 
+  var runId = registrar.insertScore()
+
   var playing = true
 
   fun execute() {
@@ -85,14 +87,22 @@ class GameEngine(
     this.trimSpaceObjects()
     this.generateAsteroids()
   }
+
+  fun evaluate(asteroid: SpaceObject) {
+    val score = asteroid.radius * asteroid.radius * asteroid.mass;
+    this.registrar.incrementScore(this.runId, score)
+  }
+
   fun handleCollisions() {
     this.field.spaceObjects.forEachPair {
       (first, second) ->
       if (first.impacts(second)) {
-        if(first.type == "Missile" && second.type == "Asteroid") {
+        if (first.type == "Missile" && second.type == "Asteroid") {
           this.field.generateExplosion(first.center)
-        } else if(first.type == "Asteroid" && second.type == "Missile") {
+          this.evaluate(second)
+        } else if (first.type == "Asteroid" && second.type == "Missile") {
           this.field.generateExplosion(second.center)
+          this.evaluate(first)
         }
         first.collideWith(second, GameEngineConfig.coefficientRestitution)
       }

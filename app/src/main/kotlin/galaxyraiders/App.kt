@@ -29,6 +29,7 @@ fun main() {
   val (controller, visualizer) = ui.build()
 
   val registrar = Registrar()
+  registrar.init()
 
   val gameEngine = GameEngine(
     generator, controller, visualizer, registrar
