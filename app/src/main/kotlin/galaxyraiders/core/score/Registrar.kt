@@ -25,7 +25,7 @@ class Registrar() {
   fun init() {
     var scoreboard = File(RegistrarConfig.scoreboardFilename)
     var leaderboard = File(RegistrarConfig.leaderboardFilename)
-    if(!scoreboard.exists() || !scoreboard.exists()) {
+    if(!scoreboard.exists() || !leaderboard.exists()) {
       scoreboard.writeText("[]")
       leaderboard.writeText("[]")
     }
